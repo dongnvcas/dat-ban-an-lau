@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Ứng dụng đặt bàn lẩu</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f9f9f9; }
+        h1 { color: #d9534f; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, button { padding: 8px; margin-top: 5px; width: 300px; max-width: 100%; }
+        button { background-color: #5cb85c; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #4cae4c; }
+        .result { margin-top: 20px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; }
+    </style>
+</head>
+<body>
+    <h1>Ứng dụng đặt bàn lẩu</h1>
+    <label for="currentQueue">Queue hiện tại:</label>
+    <input type="number" id="currentQueue" value="125">
+
+    <label for="minutesPerQueue">Số phút mỗi queue:</label>
+    <input type="number" id="minutesPerQueue" value="5">
+
+    <label for="desiredTime">Thời gian mong muốn ăn:</label>
+    <input type="datetime-local" id="desiredTime" value="2025-09-08T17:00">
+
+    <label for="queueIncreaseRate">Số lượng queue tăng mỗi 30 phút:</label>
+    <input type="number" id="queueIncreaseRate" value="10">
+
+    <button onclick="calculate()">Tính toán</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        function calculate() {
+            const currentQueue = parseInt(document.getElementById('currentQueue').value);
+            const minutesPerQueue = parseInt(document.getElementById('minutesPerQueue').value);
+            const desiredTime = new Date(document.getElementById('desiredTime').value);
+            const queueIncreaseRate = parseInt(document.getElementById('queueIncreaseRate').value);
+
+            const now = new Date();
+            const eatingTimeIfBookNow = new Date(now.getTime() + currentQueue * minutesPerQueue * 60000);
+
+            let resultText = `Nếu book ngay bây giờ, bạn sẽ được ăn lúc: ${eatingTimeIfBookNow.toLocaleString()}<br><br>`;
+
+            const diffMinutes = (desiredTime - now) / 60000;
+            const halfHours = diffMinutes / 30;
+            const estimatedQueueAtDesiredTime = currentQueue + Math.floor(halfHours * queueIncreaseRate);
+            const minutesToEatFromNow = estimatedQueueAtDesiredTime * minutesPerQueue;
+            const bookTime = new Date(desiredTime.getTime() - minutesToEatFromNow * 60000);
+
+            if (bookTime > now) {
+                resultText += `Để ăn vào lúc ${desiredTime.toLocaleString()}, bạn nên book vào lúc: ${bookTime.toLocaleString()}`;
+            } else {
+                resultText += `Không thể tìm được thời điểm book phù hợp để ăn đúng giờ mong muốn. Bạn nên book ngay để ăn sớm nhất có thể.`;
+            }
+
+            document.getElementById('result').innerHTML = resultText;
+        }
+    </script>
+</body>
+</html>
